@@ -466,7 +466,7 @@ export type Database = {
           locale?: string
           message?: string
           name: string
-          organization_id: string
+          organization_id?: string
           phone?: string
           property_id: string
           status?: Database["public"]["Enums"]["inquiry_status"]
@@ -1367,17 +1367,6 @@ export type Database = {
     Functions: {
       accept_organization_invite: {
         Args: { invite_token: string }
-        Returns: string
-      }
-      submit_property_inquiry: {
-        Args: {
-          p_email?: string
-          p_locale?: string
-          p_message?: string
-          p_name: string
-          p_phone: string
-          p_property_id: string
-        }
         Returns: string
       }
     }

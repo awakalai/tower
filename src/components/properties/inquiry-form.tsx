@@ -30,13 +30,13 @@ export function InquiryForm({ propertyId, locale }: { propertyId: string; locale
     const supabase = createClient();
     if (!supabase) return toast.error(t("inquiryError"));
     setSending(true);
-    const { error } = await supabase.rpc("submit_property_inquiry", {
-      p_property_id: propertyId,
-      p_name: name,
-      p_phone: phone,
-      p_email: String(form.get("email") ?? "").trim(),
-      p_message: String(form.get("message") ?? "").trim(),
-      p_locale: locale,
+    const { error } = await supabase.from("inquiries").insert({
+      property_id: propertyId,
+      name,
+      phone,
+      email: String(form.get("email") ?? "").trim(),
+      message: String(form.get("message") ?? "").trim(),
+      locale,
     });
     setSending(false);
     if (error) return toast.error(t("inquiryError"), { description: error.message });
