@@ -146,7 +146,7 @@ export default async function PropertyDetailsPage({
                 </div>
               )}
 
-              <InquiryForm propertyId={property.id} organizationId={property.organization_id} locale={locale} />
+              <InquiryForm propertyId={property.id} locale={locale} />
             </CardContent>
           </Card>
         </aside>

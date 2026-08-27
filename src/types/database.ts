@@ -1369,6 +1369,17 @@ export type Database = {
         Args: { invite_token: string }
         Returns: string
       }
+      submit_property_inquiry: {
+        Args: {
+          p_email?: string
+          p_locale?: string
+          p_message?: string
+          p_name: string
+          p_phone: string
+          p_property_id: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       contact_type:
@@ -1645,4 +1656,3 @@ export type InquiryRow = Database["public"]["Tables"]["inquiries"]["Row"]
 export type AuditLogRow = Database["public"]["Tables"]["audit_logs"]["Row"]
 export type DocumentRow = Database["public"]["Tables"]["documents"]["Row"]
 export type DealFinancialSummaryRow = Database["public"]["Views"]["deal_financial_summary"]["Row"]
-
