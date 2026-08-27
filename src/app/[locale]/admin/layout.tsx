@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
+import { EnterpriseTopbar } from "@/components/admin/enterprise-topbar";
+import { getEnterpriseContext } from "@/lib/data/enterprise";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -17,11 +19,15 @@ export default async function AdminLayout({
   if (error || !data?.claims) redirect(`/${locale}/login`);
 
   const email = typeof data.claims.email === "string" ? data.claims.email : "Administrator";
+  const context = await getEnterpriseContext();
 
   return (
     <div className="min-h-[calc(100svh-4rem)] bg-muted/20 lg:ps-64">
       <AdminSidebar email={email} />
-      <div className="min-w-0">{children}</div>
+      <div className="min-w-0">
+        <EnterpriseTopbar context={context} />
+        {children}
+      </div>
     </div>
   );
 }

@@ -2,7 +2,7 @@ import type { PropertyRow } from "@/types/database";
 
 const baseDate = "2026-08-01T08:00:00.000Z";
 
-export const demoProperties: PropertyRow[] = [
+const legacyDemoProperties = [
   {
     id: "11111111-1111-4111-8111-111111111111",
     reference_code: "TWR-1001",
@@ -166,3 +166,18 @@ export const demoProperties: PropertyRow[] = [
     updated_at: baseDate
   }
 ];
+
+export const demoProperties: PropertyRow[] = legacyDemoProperties.map((property) => ({
+  organization_id: "00000000-0000-4000-8000-000000000001",
+  branch_id: null,
+  project_id: null,
+  owner_contact_id: null,
+  bedrooms: null,
+  bathrooms: null,
+  floors: null,
+  parking_spaces: null,
+  year_built: null,
+  features: {},
+  internal_notes: "",
+  ...property,
+})) as PropertyRow[];

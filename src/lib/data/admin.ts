@@ -1,7 +1,7 @@
 import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
-import type { ExpenseRow, PropertyRow, ReceiptRow } from "@/types/database";
+import type { ExpenseRow, InstallmentRow, PropertyRow, ReceiptRow } from "@/types/database";
 
 export type DashboardData = {
   metrics: {
@@ -11,6 +11,11 @@ export type DashboardData = {
     expenses: number;
     pendingInstallments: number;
     completion: number;
+    activeLeads: number;
+    pipelineValue: number;
+    overdueInstallments: number;
+    activeProjects: number;
+    openTasks: number;
   };
   cashFlow: Array<{ month: string; revenue: number; expense: number }>;
   portfolio: Array<{ status: PropertyRow["status"]; value: number }>;
@@ -25,6 +30,11 @@ const emptyDashboard: DashboardData = {
     expenses: 0,
     pendingInstallments: 0,
     completion: 0,
+    activeLeads: 0,
+    pipelineValue: 0,
+    overdueInstallments: 0,
+    activeProjects: 0,
+    openTasks: 0,
   },
   cashFlow: [],
   portfolio: [],
@@ -62,19 +72,26 @@ export async function getDashboardData(): Promise<DashboardData> {
   const supabase = await createClient();
   if (!supabase) return emptyDashboard;
 
-  const [propertiesResult, expensesResult, receiptsResult] = await Promise.all([
+  const [propertiesResult, expensesResult, receiptsResult, leadsResult, dealsResult, installmentsResult, projectsResult, tasksResult] = await Promise.all([
     supabase.from("properties").select("*"),
     supabase.from("expenses").select("*").order("incurred_on", { ascending: false }),
     supabase.from("receipts").select("*").order("payment_date", { ascending: false }),
+    supabase.from("leads").select("status"),
+    supabase.from("deals").select("status,total_value"),
+    supabase.from("installments").select("*").order("due_date"),
+    supabase.from("projects").select("status"),
+    supabase.from("tasks").select("status"),
   ]);
 
-  const error = propertiesResult.error ?? expensesResult.error ?? receiptsResult.error;
+  const error = propertiesResult.error ?? expensesResult.error ?? receiptsResult.error ?? leadsResult.error ?? dealsResult.error ?? installmentsResult.error ?? projectsResult.error ?? tasksResult.error;
   if (error) throw error;
 
   const properties = propertiesResult.data ?? [];
   const expenses = expensesResult.data ?? [];
   const receipts = receiptsResult.data ?? [];
   const issuedReceipts = receipts.filter((receipt) => receipt.status === "issued");
+  const installments = (installmentsResult.data ?? []) as InstallmentRow[];
+  const today = new Date().toISOString().slice(0, 10);
 
   const completion = properties.length
     ? Math.round(
@@ -98,6 +115,17 @@ export async function getDashboardData(): Promise<DashboardData> {
         0,
       ),
       completion,
+      activeLeads: (leadsResult.data ?? []).filter((lead) => !["won", "lost"].includes(lead.status)).length,
+      pipelineValue: (dealsResult.data ?? [])
+        .filter((deal) => !["completed", "cancelled"].includes(deal.status))
+        .reduce((total, deal) => total + Number(deal.total_value), 0),
+      overdueInstallments: installments.filter(
+        (installment) => installment.status === "overdue" || (
+          ["pending", "partial"].includes(installment.status) && installment.due_date < today
+        ),
+      ).length,
+      activeProjects: (projectsResult.data ?? []).filter((project) => project.status === "active").length,
+      openTasks: (tasksResult.data ?? []).filter((task) => !["completed", "cancelled"].includes(task.status)).length,
     },
     cashFlow: buildMonthSeries(issuedReceipts, expenses),
     portfolio,
@@ -134,6 +162,14 @@ export async function getAdminReceipts() {
     .from("receipts")
     .select("*")
     .order("payment_date", { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function getAdminProjects() {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase.from("projects").select("*").order("name");
   if (error) throw error;
   return data ?? [];
 }

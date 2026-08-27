@@ -1,11 +1,11 @@
 import { PropertyManager } from "@/components/admin/property-manager";
-import { getAdminProperties } from "@/lib/data/admin";
+import { getAdminProjects, getAdminProperties } from "@/lib/data/admin";
 
 export default async function AdminPropertiesPage() {
-  const properties = await getAdminProperties();
+  const [properties, projects] = await Promise.all([getAdminProperties(), getAdminProjects()]);
   return (
     <main className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">
-      <PropertyManager initialProperties={properties} />
+      <PropertyManager initialProperties={properties} projects={projects} />
     </main>
   );
 }

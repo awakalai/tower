@@ -28,6 +28,14 @@ export const propertySchema = z.object({
   payment_options: z.array(z.enum(["cash", "installment", "advance"])).min(1),
   completion_percent: z.number().int().min(0).max(100),
   is_published: z.boolean(),
+  project_id: z.uuid().nullable(),
+  bedrooms: z.number().int().min(0).max(100).nullable(),
+  bathrooms: z.number().int().min(0).max(100).nullable(),
+  floors: z.number().int().min(0).max(200).nullable(),
+  parking_spaces: z.number().int().min(0).max(1000).nullable(),
+  year_built: z.number().int().min(1800).max(2200).nullable(),
+  features: z.array(z.string().trim().min(1).max(80)).max(50),
+  internal_notes: z.string().trim().max(4000),
 });
 
 export const expenseSchema = z.object({

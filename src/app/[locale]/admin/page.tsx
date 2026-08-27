@@ -3,8 +3,13 @@ import {
   BanknoteArrowUp,
   Building2,
   CircleDollarSign,
+  ClipboardList,
   Construction,
+  FolderKanban,
   HousePlug,
+  Radar,
+  Siren,
+  TrendingUp,
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
@@ -19,11 +24,12 @@ import { formatCurrency, toIntlLocale } from "@/lib/utils";
 
 export default async function AdminDashboardPage({ params }: PageProps<"/[locale]/admin">) {
   const { locale } = await params;
-  const [data, t, receiptT, propertyT] = await Promise.all([
+  const [data, t, receiptT, propertyT, enterpriseT] = await Promise.all([
     getDashboardData(),
     getTranslations({ locale, namespace: "Dashboard" }),
     getTranslations({ locale, namespace: "Receipts" }),
     getTranslations({ locale, namespace: "Property" }),
+    getTranslations({ locale, namespace: "Enterprise" }),
   ]);
 
   return (
@@ -41,6 +47,14 @@ export default async function AdminDashboardPage({ params }: PageProps<"/[locale
         <MetricCard label={t("expenses")} value={formatCurrency(data.metrics.expenses, "USD", locale)} icon={BanknoteArrowDown} tone="warning" />
         <MetricCard label={t("pending")} value={formatCurrency(data.metrics.pendingInstallments, "USD", locale)} icon={CircleDollarSign} tone="brand" />
         <MetricCard label={t("completion")} value={`${data.metrics.completion}%`} icon={Construction} />
+      </section>
+
+      <section className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <MetricCard label={enterpriseT("activeLeads")} value={String(data.metrics.activeLeads)} icon={Radar} tone="brand" />
+        <MetricCard label={enterpriseT("pipelineValue")} value={formatCurrency(data.metrics.pipelineValue, "USD", locale)} icon={TrendingUp} tone="success" />
+        <MetricCard label={enterpriseT("overdueInstallments")} value={String(data.metrics.overdueInstallments)} icon={Siren} tone="warning" />
+        <MetricCard label={enterpriseT("activeProjects")} value={String(data.metrics.activeProjects)} icon={FolderKanban} />
+        <MetricCard label={enterpriseT("openTasks")} value={String(data.metrics.openTasks)} icon={ClipboardList} />
       </section>
 
       <section className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(360px,.65fr)]">

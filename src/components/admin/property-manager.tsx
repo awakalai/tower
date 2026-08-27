@@ -48,7 +48,7 @@ import { normalizeLocalizedText } from "@/lib/domain";
 import { createClient } from "@/lib/supabase/client";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 import { propertySchema } from "@/lib/validation";
-import type { Database, PropertyRow } from "@/types/database";
+import type { Database, ProjectRow, PropertyRow } from "@/types/database";
 
 const LocationPickerMap = dynamic(() => import("./location-picker-map"), {
   ssr: false,
@@ -71,6 +71,14 @@ type PropertyDraft = {
   payment_options: PaymentMethod[];
   completion_percent: number;
   is_published: boolean;
+  project_id: string | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  floors: number | null;
+  parking_spaces: number | null;
+  year_built: number | null;
+  features: string[];
+  internal_notes: string;
 };
 
 const emptyDraft: PropertyDraft = {
@@ -87,6 +95,14 @@ const emptyDraft: PropertyDraft = {
   payment_options: ["cash"],
   completion_percent: 100,
   is_published: true,
+  project_id: null,
+  bedrooms: null,
+  bathrooms: null,
+  floors: null,
+  parking_spaces: null,
+  year_built: null,
+  features: [],
+  internal_notes: "",
 };
 
 function draftFromProperty(property: PropertyRow): PropertyDraft {
@@ -104,10 +120,20 @@ function draftFromProperty(property: PropertyRow): PropertyDraft {
     payment_options: property.payment_options,
     completion_percent: property.completion_percent,
     is_published: property.is_published,
+    project_id: property.project_id,
+    bedrooms: property.bedrooms,
+    bathrooms: property.bathrooms,
+    floors: property.floors,
+    parking_spaces: property.parking_spaces,
+    year_built: property.year_built,
+    features: property.features && typeof property.features === "object" && !Array.isArray(property.features) && Array.isArray(property.features.amenities)
+      ? property.features.amenities.filter((item): item is string => typeof item === "string")
+      : [],
+    internal_notes: property.internal_notes,
   };
 }
 
-export function PropertyManager({ initialProperties }: { initialProperties: PropertyRow[] }) {
+export function PropertyManager({ initialProperties, projects }: { initialProperties: PropertyRow[]; projects: ProjectRow[] }) {
   const locale = useLocale();
   const t = useTranslations("PropertiesAdmin");
   const common = useTranslations("Common");
@@ -160,8 +186,10 @@ export function PropertyManager({ initialProperties }: { initialProperties: Prop
     }
 
     setSaving(true);
+    const { features, ...validated } = parsed.data;
     const payload: Database["public"]["Tables"]["properties"]["Insert"] = {
-      ...parsed.data,
+      ...validated,
+      features: { amenities: features },
       currency: "USD",
       gallery: [],
     };
@@ -295,6 +323,23 @@ export function PropertyManager({ initialProperties }: { initialProperties: Prop
                     <Label htmlFor="image">{t("image")}</Label>
                     <Input id="image" type="url" value={draft.image_url} onChange={(event) => setDraft((current) => ({ ...current, image_url: event.target.value }))} required />
                   </div>
+                  <div className="grid gap-2">
+                    <Label>{t("project")}</Label>
+                    <Select value={draft.project_id ?? "none"} onValueChange={(project_id) => setDraft((current) => ({ ...current, project_id: project_id === "none" ? null : project_id }))}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent><SelectItem value="none">{t("noProject")}</SelectItem>{projects.map((project) => <SelectItem value={project.id} key={project.id}>{project.name}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                    {(["bedrooms", "bathrooms", "floors", "parking_spaces", "year_built"] as const).map((field) => (
+                      <div className="grid gap-2" key={field}>
+                        <Label htmlFor={field}>{t(field === "parking_spaces" ? "parking" : field === "year_built" ? "yearBuilt" : field)}</Label>
+                        <Input id={field} type="number" min="0" value={draft[field] ?? ""} onChange={(event) => setDraft((current) => ({ ...current, [field]: event.target.value ? Number(event.target.value) : null }))} />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="grid gap-2"><Label htmlFor="features">{t("features")}</Label><Input id="features" value={draft.features.join(", ")} onChange={(event) => setDraft((current) => ({ ...current, features: event.target.value.split(",").map((item) => item.trim()).filter(Boolean) }))} placeholder={t("featuresHint")} /></div>
+                  <div className="grid gap-2"><Label htmlFor="internal-notes">{t("internalNotes")}</Label><Textarea id="internal-notes" value={draft.internal_notes} onChange={(event) => setDraft((current) => ({ ...current, internal_notes: event.target.value }))} /></div>
                 </div>
 
                 <div className="grid content-start gap-5">

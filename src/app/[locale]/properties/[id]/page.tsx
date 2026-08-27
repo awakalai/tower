@@ -1,4 +1,4 @@
-import { ArrowLeft, Banknote, Building2, CalendarClock, MapPin, Ruler } from "lucide-react";
+import { ArrowLeft, Banknote, Bath, BedDouble, Building2, CalendarClock, CarFront, Layers3, MapPin, Ruler } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { hasLocale } from "next-intl";
@@ -6,6 +6,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
+import { InquiryForm } from "@/components/properties/inquiry-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
@@ -36,6 +37,9 @@ export default async function PropertyDetailsPage({
     getTranslations({ locale, namespace: "Map" }),
   ]);
   if (!property) notFound();
+  const amenities = property.features && typeof property.features === "object" && !Array.isArray(property.features) && Array.isArray(property.features.amenities)
+    ? property.features.amenities.filter((item): item is string => typeof item === "string")
+    : [];
 
   return (
     <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-10">
@@ -82,6 +86,15 @@ export default async function PropertyDetailsPage({
             <p className="mt-3 max-w-3xl text-[15px] leading-8 text-muted-foreground">
               {property.localizedDescription}
             </p>
+            {property.property_type !== "land" && (
+              <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="rounded-xl border bg-card p-4"><BedDouble className="size-5 text-primary" /><p className="mt-2 text-xs text-muted-foreground">{t("bedrooms")}</p><p className="font-semibold">{property.bedrooms ?? "—"}</p></div>
+                <div className="rounded-xl border bg-card p-4"><Bath className="size-5 text-primary" /><p className="mt-2 text-xs text-muted-foreground">{t("bathrooms")}</p><p className="font-semibold">{property.bathrooms ?? "—"}</p></div>
+                <div className="rounded-xl border bg-card p-4"><Layers3 className="size-5 text-primary" /><p className="mt-2 text-xs text-muted-foreground">{t("floors")}</p><p className="font-semibold">{property.floors ?? "—"}</p></div>
+                <div className="rounded-xl border bg-card p-4"><CarFront className="size-5 text-primary" /><p className="mt-2 text-xs text-muted-foreground">{t("parking")}</p><p className="font-semibold">{property.parking_spaces ?? "—"}</p></div>
+              </div>
+            )}
+            {amenities.length > 0 && <div className="mt-7"><h2 className="text-lg font-semibold">{t("amenities")}</h2><div className="mt-3 flex flex-wrap gap-2">{amenities.map((amenity) => <Badge key={amenity} variant="outline" className="bg-card px-3 py-1.5">{amenity}</Badge>)}</div></div>}
           </div>
         </section>
 
@@ -133,7 +146,7 @@ export default async function PropertyDetailsPage({
                 </div>
               )}
 
-              <Button size="lg" className="mt-1 w-full">{t("contact")}</Button>
+              <InquiryForm propertyId={property.id} organizationId={property.organization_id} locale={locale} />
             </CardContent>
           </Card>
         </aside>

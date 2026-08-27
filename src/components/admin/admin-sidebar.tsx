@@ -2,11 +2,21 @@
 
 import {
   Building2,
+  BriefcaseBusiness,
   ChartNoAxesCombined,
+  ClipboardCheck,
+  ContactRound,
+  FolderKanban,
+  FolderLock,
+  Landmark,
   LogOut,
   MapPinned,
+  ReceiptCent,
   Menu,
   ReceiptText,
+  ScrollText,
+  Settings2,
+  UsersRound,
   WalletCards,
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -29,8 +39,18 @@ import { cn } from "@/lib/utils";
 const items = [
   { href: "/admin", key: "overview", icon: ChartNoAxesCombined },
   { href: "/admin/properties", key: "properties", icon: Building2 },
+  { href: "/admin/projects", key: "projects", icon: FolderKanban },
+  { href: "/admin/crm", key: "crm", icon: ContactRound },
+  { href: "/admin/deals", key: "deals", icon: BriefcaseBusiness },
+  { href: "/admin/installments", key: "installments", icon: ReceiptCent },
   { href: "/admin/expenses", key: "expenses", icon: WalletCards },
   { href: "/admin/receipts", key: "receipts", icon: ReceiptText },
+  { href: "/admin/tasks", key: "tasks", icon: ClipboardCheck },
+  { href: "/admin/documents", key: "documents", icon: FolderLock },
+  { href: "/admin/team", key: "team", icon: UsersRound },
+  { href: "/admin/reports", key: "reports", icon: Landmark },
+  { href: "/admin/audit", key: "audit", icon: ScrollText },
+  { href: "/admin/settings", key: "settings", icon: Settings2 },
 ] as const;
 
 function SidebarContent({ email, onNavigate }: { email: string; onNavigate?: boolean }) {
@@ -46,7 +66,7 @@ function SidebarContent({ email, onNavigate }: { email: string; onNavigate?: boo
         <h2 className="mt-1 text-sm font-semibold">{t("workspace")}</h2>
       </div>
       <Separator />
-      <nav className="grid gap-1 p-3" aria-label={t("menu")}>
+      <nav className="grid gap-1 overflow-y-auto p-3" aria-label={t("menu")}>
         {items.map(({ href, key, icon: Icon }) => {
           const active = href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
           const content = (

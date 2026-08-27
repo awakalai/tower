@@ -70,6 +70,10 @@ function asPreview(draft: ReceiptDraft): ReceiptRow {
     currency: "USD",
     status: "issued",
     issued_by: null,
+    organization_id: "00000000-0000-4000-8000-000000000001",
+    branch_id: null,
+    contact_id: null,
+    deal_id: null,
     created_at: now,
     updated_at: now,
   };
