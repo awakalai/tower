@@ -1,0 +1,227 @@
+@config "../../tailwind.config.ts";
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #f0ede6;
+  --foreground: #171717;
+  --card: #faf8f3;
+  --card-foreground: #171717;
+  --popover: #fffdf8;
+  --popover-foreground: #171717;
+  --primary: #cc0202;
+  --primary-foreground: #ffffff;
+  --secondary: #e6e1d7;
+  --secondary-foreground: #231f1c;
+  --muted: #e9e5dd;
+  --muted-foreground: #6d665f;
+  --accent: #f5dada;
+  --accent-foreground: #8d0101;
+  --destructive: #b91c1c;
+  --destructive-foreground: #ffffff;
+  --border: #d8d2c7;
+  --input: #d8d2c7;
+  --ring: #cc0202;
+  --radius: 0.875rem;
+  --success: #147a54;
+  --warning: #a16207;
+}
+
+.dark {
+  --background: #0d0d0f;
+  --foreground: #f0ede6;
+  --card: #161619;
+  --card-foreground: #f0ede6;
+  --popover: #19191d;
+  --popover-foreground: #f0ede6;
+  --primary: #cc0202;
+  --primary-foreground: #ffffff;
+  --secondary: #242429;
+  --secondary-foreground: #f0ede6;
+  --muted: #232328;
+  --muted-foreground: #aaa39a;
+  --accent: #3f1719;
+  --accent-foreground: #ffd8d8;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #303036;
+  --input: #35353b;
+  --ring: #ed2525;
+  --success: #3dbb86;
+  --warning: #eab84b;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
+  --radius-sm: calc(var(--radius) * 0.75);
+  --radius-md: calc(var(--radius) * 0.875);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  min-height: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100%;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+html[dir="rtl"] body {
+  font-family: "Noto Sans Arabic Variable", ui-sans-serif, system-ui, sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--primary) 24%, transparent);
+}
+
+.glass-panel {
+  background: color-mix(in srgb, var(--card) 86%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
+  box-shadow: 0 22px 70px -38px rgb(0 0 0 / 0.48);
+  backdrop-filter: blur(18px) saturate(140%);
+}
+
+.map-label-marker {
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.map-label-marker span {
+  display: inline-flex;
+  min-width: max-content;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgb(255 255 255 / 0.92);
+  border-radius: 999px;
+  background: #cc0202;
+  box-shadow: 0 8px 22px rgb(95 0 0 / 0.32);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1;
+  padding: 7px 10px;
+  transform: translate(-50%, -50%);
+}
+
+.leaflet-container {
+  background: #d8d2c7;
+  font-family: inherit;
+}
+
+.leaflet-control-attribution {
+  background: color-mix(in srgb, var(--card) 82%, transparent) !important;
+  color: var(--muted-foreground) !important;
+}
+
+.leaflet-control-attribution a {
+  color: var(--primary) !important;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--card) !important;
+  color: var(--card-foreground) !important;
+}
+
+.leaflet-popup-content-wrapper {
+  border: 1px solid var(--border);
+  border-radius: var(--radius) !important;
+  box-shadow: 0 24px 70px -28px rgb(0 0 0 / 0.55) !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  width: 290px !important;
+}
+
+[dir="rtl"] .directional-icon {
+  transform: scaleX(-1);
+}
+
+.receipt-paper {
+  background: #ffffff;
+  color: #18181b;
+}
+
+@page {
+  size: A4;
+  margin: 10mm;
+}
+
+@media print {
+  html,
+  body {
+    background: #ffffff !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .receipt-paper {
+    width: 100% !important;
+    min-height: auto !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .thermal-mode {
+    width: 80mm !important;
+    padding: 5mm !important;
+    font-size: 11px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
