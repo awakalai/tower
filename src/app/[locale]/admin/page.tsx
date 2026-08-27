@@ -15,7 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getDashboardData } from "@/lib/data/admin";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, toIntlLocale } from "@/lib/utils";
 
 export default async function AdminDashboardPage({ params }: PageProps<"/[locale]/admin">) {
   const { locale } = await params;
@@ -94,7 +94,7 @@ export default async function AdminDashboardPage({ params }: PageProps<"/[locale
                     <TableCell className="font-mono text-xs font-semibold">{receipt.receipt_number}</TableCell>
                     <TableCell>{receipt.customer_name}</TableCell>
                     <TableCell><Badge variant="outline">{propertyT(receipt.payment_type)}</Badge></TableCell>
-                    <TableCell>{new Intl.DateTimeFormat(locale === "ku" ? "ckb" : locale).format(new Date(receipt.payment_date))}</TableCell>
+                    <TableCell>{new Intl.DateTimeFormat(toIntlLocale(locale)).format(new Date(receipt.payment_date))}</TableCell>
                     <TableCell className="text-end font-semibold">{formatCurrency(Number(receipt.amount), receipt.currency, locale)}</TableCell>
                   </TableRow>
                 ))}

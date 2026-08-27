@@ -31,7 +31,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { normalizeLocalizedText } from "@/lib/domain";
 import { createClient } from "@/lib/supabase/client";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, toIntlLocale } from "@/lib/utils";
 import { expenseSchema } from "@/lib/validation";
 import type { Database, ExpenseRow, PropertyRow } from "@/types/database";
 
@@ -234,7 +234,7 @@ export function ExpenseManager({
             <TableBody>
               {expenses.map((expense) => (
                 <TableRow key={expense.id}>
-                  <TableCell>{new Intl.DateTimeFormat(locale === "ku" ? "ckb" : locale).format(new Date(expense.incurred_on))}</TableCell>
+                  <TableCell>{new Intl.DateTimeFormat(toIntlLocale(locale)).format(new Date(expense.incurred_on))}</TableCell>
                   <TableCell><Badge variant="outline">{t(expense.category)}</Badge></TableCell>
                   <TableCell className="font-medium">{expense.vendor}</TableCell>
                   <TableCell className="max-w-[220px] truncate text-muted-foreground">{expense.property_id ? propertyNames.get(expense.property_id) : t("none")}</TableCell>

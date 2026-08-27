@@ -15,7 +15,7 @@ import {
 } from "recharts";
 
 import type { DashboardData } from "@/lib/data/admin";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, toIntlLocale } from "@/lib/utils";
 
 const COLORS = ["#CC0202", "#D49A1F", "#6B7280", "#147A54"];
 
@@ -24,7 +24,7 @@ export function CashFlowChart({ data }: { data: DashboardData["cashFlow"] }) {
   const t = useTranslations("Dashboard");
   const formatted = data.map((item) => ({
     ...item,
-    label: new Intl.DateTimeFormat(locale === "ku" ? "ckb" : locale, {
+    label: new Intl.DateTimeFormat(toIntlLocale(locale), {
       month: "short",
     }).format(new Date(`${item.month}-01T00:00:00Z`)),
   }));

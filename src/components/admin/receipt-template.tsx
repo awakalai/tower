@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { forwardRef } from "react";
 
 import { Separator } from "@/components/ui/separator";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, toIntlLocale } from "@/lib/utils";
 import type { ReceiptRow } from "@/types/database";
 
 type ReceiptTemplateProps = {
@@ -18,7 +18,7 @@ export const ReceiptTemplate = forwardRef<HTMLDivElement, ReceiptTemplateProps>(
   function ReceiptTemplate({ locale, propertyName, receipt }, ref) {
     const t = useTranslations("Receipts");
     const propertyT = useTranslations("Property");
-    const dateLocale = locale === "ku" ? "ckb" : locale;
+    const dateLocale = toIntlLocale(locale);
     const date = new Intl.DateTimeFormat(dateLocale, {
       dateStyle: "long",
     }).format(new Date(`${receipt.payment_date}T12:00:00Z`));
