@@ -1,0 +1,39 @@
+import { KeyRound } from "lucide-react";
+import { hasLocale } from "next-intl";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { notFound, redirect } from "next/navigation";
+
+import { UpdatePasswordForm } from "@/components/auth/update-password-form";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { routing } from "@/i18n/routing";
+import { createClient } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
+
+export default async function UpdatePasswordPage({ params }: PageProps<"/[locale]/update-password">) {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) notFound();
+  setRequestLocale(locale);
+  const [t, supabase] = await Promise.all([
+    getTranslations({ locale, namespace: "Auth" }),
+    createClient(),
+  ]);
+  if (!supabase) redirect(`/${locale}/login`);
+  const { data } = await supabase.auth.getClaims();
+  if (!data?.claims?.sub) redirect(`/${locale}/forgot-password`);
+
+  return (
+    <main className="relative grid min-h-[calc(100svh-4rem)] place-items-center overflow-hidden p-4 sm:p-6">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(204,2,2,.12),transparent_38%)]" />
+      <Card className="relative w-full max-w-md overflow-hidden shadow-premium">
+        <div className="h-1.5 bg-primary" />
+        <CardHeader>
+          <span className="mb-3 grid size-12 place-items-center rounded-xl bg-primary text-primary-foreground"><KeyRound aria-hidden="true" /></span>
+          <CardTitle className="text-2xl">{t("updatePasswordTitle")}</CardTitle>
+          <CardDescription>{t("updatePasswordSubtitle")}</CardDescription>
+        </CardHeader>
+        <CardContent><UpdatePasswordForm /></CardContent>
+      </Card>
+    </main>
+  );
+}

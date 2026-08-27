@@ -8,6 +8,7 @@ import {
   ContactRound,
   FolderKanban,
   FolderLock,
+  Inbox,
   Landmark,
   LogOut,
   MapPinned,
@@ -39,6 +40,7 @@ import { cn } from "@/lib/utils";
 const items = [
   { href: "/admin", key: "overview", icon: ChartNoAxesCombined },
   { href: "/admin/properties", key: "properties", icon: Building2 },
+  { href: "/admin/submissions", key: "submissions", icon: Inbox },
   { href: "/admin/projects", key: "projects", icon: FolderKanban },
   { href: "/admin/crm", key: "crm", icon: ContactRound },
   { href: "/admin/deals", key: "deals", icon: BriefcaseBusiness },

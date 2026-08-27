@@ -6,6 +6,28 @@ export const loginSchema = z.object({
   locale: z.enum(["en", "ku", "ar"]),
 });
 
+export const registerSchema = z.object({
+  fullName: z.string().trim().min(2).max(160),
+  phone: z.string().trim().min(6).max(40),
+  email: z.email().trim().toLowerCase(),
+  password: z.string().min(8).max(128),
+  locale: z.enum(["en", "ku", "ar"]),
+});
+
+export const emailSchema = z.object({
+  email: z.email().trim().toLowerCase(),
+  locale: z.enum(["en", "ku", "ar"]),
+});
+
+export const passwordUpdateSchema = z.object({
+  password: z.string().min(8).max(128),
+  confirmation: z.string().min(8).max(128),
+  locale: z.enum(["en", "ku", "ar"]),
+}).refine((value) => value.password === value.confirmation, {
+  path: ["confirmation"],
+  message: "passwords_mismatch",
+});
+
 export const propertySchema = z.object({
   title: z.object({
     en: z.string().trim().min(2).max(120),

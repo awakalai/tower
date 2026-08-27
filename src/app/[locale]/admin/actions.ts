@@ -32,6 +32,47 @@ async function client() {
   return supabase;
 }
 
+export type SubmissionReviewState = {
+  status: "idle" | "success" | "error";
+  message?: string;
+};
+
+export async function reviewSubmissionAction(
+  _previousState: SubmissionReviewState,
+  formData: FormData,
+): Promise<SubmissionReviewState> {
+  const supabase = await client();
+  const id = value(formData, "id");
+  const locale = ["en", "ku", "ar"].includes(value(formData, "locale"))
+    ? value(formData, "locale")
+    : "en";
+  const decision = value(formData, "decision");
+  const reviewerNotes = value(formData, "reviewer_notes");
+
+  if (!id || !["under_review", "approved", "rejected"].includes(decision)) {
+    return { status: "error", message: "Invalid review decision." };
+  }
+  if (decision === "rejected" && reviewerNotes.length < 3) {
+    return { status: "error", message: "A rejection reason is required." };
+  }
+
+  const { error } = await supabase
+    .from("property_submissions")
+    .update({
+      status: decision as "under_review" | "approved" | "rejected",
+      reviewer_notes: reviewerNotes,
+    })
+    .eq("id", id);
+
+  if (error) return { status: "error", message: error.message };
+
+  revalidatePath(`/${locale}/admin/submissions`);
+  revalidatePath(`/${locale}/admin/properties`);
+  revalidatePath(`/${locale}/admin`);
+  revalidatePath(`/${locale}`);
+  return { status: "success" };
+}
+
 export async function createContactAction(formData: FormData) {
   const supabase = await client();
   const firstName = value(formData, "first_name");

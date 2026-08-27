@@ -132,6 +132,7 @@ export type Database = {
           notes: string
           organization_id: string
           phone: string
+          portal_user_id: string | null
           source: Database["public"]["Enums"]["lead_source"]
           updated_at: string
         }
@@ -152,6 +153,7 @@ export type Database = {
           notes?: string
           organization_id?: string
           phone?: string
+          portal_user_id?: string | null
           source?: Database["public"]["Enums"]["lead_source"]
           updated_at?: string
         }
@@ -172,6 +174,7 @@ export type Database = {
           notes?: string
           organization_id?: string
           phone?: string
+          portal_user_id?: string | null
           source?: Database["public"]["Enums"]["lead_source"]
           updated_at?: string
         }
@@ -1101,6 +1104,129 @@ export type Database = {
           },
         ]
       }
+      property_submissions: {
+        Row: {
+          address: string
+          approved_property_id: string | null
+          area_m2: number
+          bathrooms: number | null
+          bedrooms: number | null
+          contact_email: string
+          contact_name: string
+          contact_phone: string
+          created_at: string
+          currency: string
+          description: string
+          features: string[]
+          floors: number | null
+          id: string
+          image_urls: string[]
+          latitude: number
+          location: unknown
+          longitude: number
+          organization_id: string
+          owner_id: string
+          parking_spaces: number | null
+          payment_options: Database["public"]["Enums"]["payment_method"][]
+          price: number
+          property_type: Database["public"]["Enums"]["property_type"]
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reviewer_notes: string
+          status: Database["public"]["Enums"]["property_submission_status"]
+          submission_locale: string
+          submitted_at: string
+          title: string
+          updated_at: string
+          year_built: number | null
+        }
+        Insert: {
+          address: string
+          approved_property_id?: string | null
+          area_m2: number
+          bathrooms?: number | null
+          bedrooms?: number | null
+          contact_email?: string
+          contact_name: string
+          contact_phone: string
+          created_at?: string
+          currency?: string
+          description?: string
+          features?: string[]
+          floors?: number | null
+          id?: string
+          image_urls: string[]
+          latitude: number
+          location?: unknown
+          longitude: number
+          organization_id?: string
+          owner_id?: string
+          parking_spaces?: number | null
+          payment_options?: Database["public"]["Enums"]["payment_method"][]
+          price: number
+          property_type: Database["public"]["Enums"]["property_type"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_notes?: string
+          status?: Database["public"]["Enums"]["property_submission_status"]
+          submission_locale?: string
+          submitted_at?: string
+          title: string
+          updated_at?: string
+          year_built?: number | null
+        }
+        Update: {
+          address?: string
+          approved_property_id?: string | null
+          area_m2?: number
+          bathrooms?: number | null
+          bedrooms?: number | null
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string
+          created_at?: string
+          currency?: string
+          description?: string
+          features?: string[]
+          floors?: number | null
+          id?: string
+          image_urls?: string[]
+          latitude?: number
+          location?: unknown
+          longitude?: number
+          organization_id?: string
+          owner_id?: string
+          parking_spaces?: number | null
+          payment_options?: Database["public"]["Enums"]["payment_method"][]
+          price?: number
+          property_type?: Database["public"]["Enums"]["property_type"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_notes?: string
+          status?: Database["public"]["Enums"]["property_submission_status"]
+          submission_locale?: string
+          submitted_at?: string
+          title?: string
+          updated_at?: string
+          year_built?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_submissions_approved_property_id_fkey"
+            columns: ["approved_property_id"]
+            isOneToOne: true
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_submissions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       receipts: {
         Row: {
           amount: number
@@ -1427,6 +1553,11 @@ export type Database = {
         | "completed"
         | "cancelled"
       property_status: "available" | "reserved" | "sold" | "construction"
+      property_submission_status:
+        | "submitted"
+        | "under_review"
+        | "approved"
+        | "rejected"
       property_type: "land" | "house" | "apartment"
       receipt_status: "issued" | "voided"
       task_status: "open" | "in_progress" | "completed" | "cancelled"
@@ -1620,6 +1751,12 @@ export const Constants = {
         "cancelled",
       ],
       property_status: ["available", "reserved", "sold", "construction"],
+      property_submission_status: [
+        "submitted",
+        "under_review",
+        "approved",
+        "rejected",
+      ],
       property_type: ["land", "house", "apartment"],
       receipt_status: ["issued", "voided"],
       task_status: ["open", "in_progress", "completed", "cancelled"],
@@ -1628,6 +1765,7 @@ export const Constants = {
 } as const
 
 export type PropertyRow = Database["public"]["Tables"]["properties"]["Row"]
+export type PropertySubmissionRow = Database["public"]["Tables"]["property_submissions"]["Row"]
 export type ExpenseRow = Database["public"]["Tables"]["expenses"]["Row"]
 export type ReceiptRow = Database["public"]["Tables"]["receipts"]["Row"]
 export type OrganizationRow = Database["public"]["Tables"]["organizations"]["Row"]

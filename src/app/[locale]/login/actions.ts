@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { getPortalDestination } from "@/lib/auth/portal";
 import { createClient } from "@/lib/supabase/server";
 import { loginSchema } from "@/lib/validation";
 
@@ -26,15 +27,16 @@ export async function loginAction(
   const supabase = await createClient();
   if (!supabase) return { status: "error", message: "unavailable" };
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email: parsed.data.email,
     password: parsed.data.password,
   });
 
-  if (error) return { status: "error", message: "invalid" };
+  if (error || !data.user) return { status: "error", message: "invalid" };
 
   revalidatePath(`/${parsed.data.locale}`, "layout");
-  redirect(`/${parsed.data.locale}/admin`);
+  const destination = await getPortalDestination(supabase, data.user.id);
+  redirect(`/${parsed.data.locale}/${destination}`);
 }
 
 export async function signOutAction(formData: FormData) {

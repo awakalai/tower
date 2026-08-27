@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, LayoutDashboard, MapPinned, Menu } from "lucide-react";
+import { Building2, HousePlus, LayoutDashboard, LogIn, MapPinned, Menu } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -75,12 +75,21 @@ export function AppHeader() {
         <div className="hidden items-center gap-1 sm:flex">
           <LanguageSwitcher compact />
           <ThemeToggle />
+          <Button asChild size="sm" variant="outline" className="ms-1">
+            <Link href="/seller/new"><HousePlus aria-hidden="true" />{t("sellProperty")}</Link>
+          </Button>
           <Button asChild size="sm" className="ms-1">
             <Link href="/login">{t("signIn")}</Link>
           </Button>
         </div>
 
         <div className="flex items-center gap-1 sm:hidden">
+          <Button asChild size="icon-sm" aria-label={t("sellProperty")}>
+            <Link href="/seller/new"><HousePlus aria-hidden="true" /></Link>
+          </Button>
+          <Button asChild variant="ghost" size="icon-sm" aria-label={t("signIn")}>
+            <Link href="/login"><LogIn aria-hidden="true" /></Link>
+          </Button>
           <ThemeToggle />
           <Sheet>
             <SheetTrigger asChild>
@@ -110,6 +119,11 @@ export function AppHeader() {
               </nav>
               <div className="mt-auto grid gap-3">
                 <LanguageSwitcher />
+                <SheetClose asChild>
+                  <Button asChild variant="outline">
+                    <Link href="/seller/new"><HousePlus aria-hidden="true" />{t("sellProperty")}</Link>
+                  </Button>
+                </SheetClose>
                 <SheetClose asChild>
                   <Button asChild>
                     <Link href="/login">{t("signIn")}</Link>

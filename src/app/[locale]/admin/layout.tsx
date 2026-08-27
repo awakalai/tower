@@ -4,6 +4,7 @@ import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { EnterpriseTopbar } from "@/components/admin/enterprise-topbar";
 import { getEnterpriseContext } from "@/lib/data/enterprise";
 import { createClient } from "@/lib/supabase/server";
+import { getPortalDestination } from "@/lib/auth/portal";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,10 @@ export default async function AdminLayout({
   if (!supabase) redirect(`/${locale}/login`);
 
   const { data, error } = await supabase.auth.getClaims();
-  if (error || !data?.claims) redirect(`/${locale}/login`);
+  if (error || !data?.claims?.sub) redirect(`/${locale}/login`);
+
+  const destination = await getPortalDestination(supabase, data.claims.sub);
+  if (destination !== "admin") redirect(`/${locale}/seller`);
 
   const email = typeof data.claims.email === "string" ? data.claims.email : "Administrator";
   const context = await getEnterpriseContext();
