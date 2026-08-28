@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+import { isSubmissionImagePath } from "@/lib/storage/image-paths";
+
+const remoteImageSchema = z.url().max(2000);
+
 export const loginSchema = z.object({
   email: z.email().trim(),
   password: z.string().min(8).max(128),
@@ -46,7 +50,10 @@ export const propertySchema = z.object({
   address: z.string().trim().min(2).max(240),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
-  image_url: z.url().max(2000),
+  image_url: z.string().trim().max(2000).refine(
+    (value) => isSubmissionImagePath(value) || remoteImageSchema.safeParse(value).success,
+    "Invalid image URL or managed storage path",
+  ),
   payment_options: z.array(z.enum(["cash", "installment", "advance"])).min(1),
   completion_percent: z.number().int().min(0).max(100),
   is_published: z.boolean(),

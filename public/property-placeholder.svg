@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title description">
+  <title id="title">Property image unavailable</title>
+  <desc id="description">A neutral placeholder with a simple building outline.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f2eee7"/>
+      <stop offset="1" stop-color="#ded7ca"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#background)"/>
+  <g fill="none" stroke="#857968" stroke-linecap="round" stroke-linejoin="round" stroke-width="28" opacity=".8">
+    <path d="M300 650V315l300-180 300 180v335"/>
+    <path d="M435 650V410h330v240M520 500h160M520 575h160"/>
+    <path d="M220 650h760"/>
+  </g>
+</svg>

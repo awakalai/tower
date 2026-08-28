@@ -18,6 +18,12 @@ import { createClient } from "@/lib/supabase/client";
 import type { Database } from "@/types/database";
 
 const imageTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
+const imageExtensions = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/avif": "avif",
+} as const;
 const maxImageBytes = 8 * 1024 * 1024;
 
 function optionalNumber(formData: FormData, key: string) {
@@ -26,9 +32,7 @@ function optionalNumber(formData: FormData, key: string) {
 }
 
 function fileExtension(file: File) {
-  const fromName = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "");
-  if (fromName && fromName.length <= 5) return fromName;
-  return file.type.split("/")[1]?.replace("jpeg", "jpg") ?? "jpg";
+  return imageExtensions[file.type as keyof typeof imageExtensions] ?? "jpg";
 }
 
 export function PropertySubmissionForm({
@@ -111,7 +115,6 @@ export function PropertySubmissionForm({
       return;
     }
 
-    const imageUrls = paths.map((path) => supabase.storage.from("property-submissions").getPublicUrl(path).data.publicUrl);
     const features = String(formData.get("features") ?? "").split(",").map((item) => item.trim()).filter(Boolean).slice(0, 50);
     const payload: Database["public"]["Tables"]["property_submissions"]["Insert"] = {
       id: submissionId,
@@ -125,7 +128,7 @@ export function PropertySubmissionForm({
       address: String(formData.get("address") ?? "").trim(),
       latitude,
       longitude,
-      image_urls: imageUrls,
+      image_urls: paths,
       payment_options: paymentOptions,
       contact_name: String(formData.get("contact_name") ?? "").trim(),
       contact_phone: String(formData.get("contact_phone") ?? "").trim(),

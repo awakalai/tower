@@ -3,6 +3,7 @@ import "server-only";
 import type { AppLocale } from "@/i18n/routing";
 import { demoProperties } from "@/lib/demo-data";
 import { toPropertyMapItem } from "@/lib/domain";
+import { signPropertyImages } from "@/lib/storage/submission-images";
 import { createPublicClient } from "@/lib/supabase/server";
 
 export async function getPublicProperties(locale: AppLocale) {
@@ -21,8 +22,10 @@ export async function getPublicProperties(locale: AppLocale) {
     return { properties: demoProperties.map((row) => toPropertyMapItem(row, locale)), demo: true };
   }
 
+  const properties = await signPropertyImages(supabase, data ?? []);
+
   return {
-    properties: (data ?? []).map((row) => toPropertyMapItem(row, locale)),
+    properties: properties.map((row) => toPropertyMapItem(row, locale)),
     demo: false,
   };
 }
@@ -42,5 +45,6 @@ export async function getPublicProperty(id: string, locale: AppLocale) {
     .maybeSingle();
 
   if (error || !data) return null;
-  return toPropertyMapItem(data, locale);
+  const [property] = await signPropertyImages(supabase, [data]);
+  return toPropertyMapItem(property, locale);
 }

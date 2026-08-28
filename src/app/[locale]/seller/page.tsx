@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
+import { resolveSubmissionImageUrls } from "@/lib/storage/submission-images";
 import { createClient } from "@/lib/supabase/server";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 
@@ -37,7 +38,17 @@ export default async function SellerPage({
   const result = supabase
     ? await supabase.from("property_submissions").select("*").order("created_at", { ascending: false })
     : { data: [], error: null };
-  const submissions = result.data ?? [];
+  const rawSubmissions = result.data ?? [];
+  const resolvedImages = supabase
+    ? await resolveSubmissionImageUrls(
+        supabase,
+        rawSubmissions.flatMap((submission) => submission.image_urls),
+      )
+    : {};
+  const submissions = rawSubmissions.map((submission) => ({
+    ...submission,
+    image_urls: submission.image_urls.map((image) => resolvedImages[image] ?? image),
+  }));
   const counts = {
     active: submissions.filter((item) => item.status === "submitted" || item.status === "under_review").length,
     approved: submissions.filter((item) => item.status === "approved").length,

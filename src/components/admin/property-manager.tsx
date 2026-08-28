@@ -45,6 +45,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { normalizeLocalizedText } from "@/lib/domain";
+import { isSubmissionImagePath, PROPERTY_IMAGE_PLACEHOLDER } from "@/lib/storage/image-paths";
 import { createClient } from "@/lib/supabase/client";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 import { propertySchema } from "@/lib/validation";
@@ -133,7 +134,15 @@ function draftFromProperty(property: PropertyRow): PropertyDraft {
   };
 }
 
-export function PropertyManager({ initialProperties, projects }: { initialProperties: PropertyRow[]; projects: ProjectRow[] }) {
+export function PropertyManager({
+  initialProperties,
+  projects,
+  imagePreviews,
+}: {
+  initialProperties: PropertyRow[];
+  projects: ProjectRow[];
+  imagePreviews: Record<string, string>;
+}) {
   const locale = useLocale();
   const t = useTranslations("PropertiesAdmin");
   const common = useTranslations("Common");
@@ -187,11 +196,19 @@ export function PropertyManager({ initialProperties, projects }: { initialProper
 
     setSaving(true);
     const { features, ...validated } = parsed.data;
+    const existingProperty = editingId
+      ? properties.find((property) => property.id === editingId)
+      : null;
     const payload: Database["public"]["Tables"]["properties"]["Insert"] = {
       ...validated,
       features: { amenities: features },
       currency: "USD",
-      gallery: [],
+      gallery: [
+        validated.image_url,
+        ...(existingProperty?.gallery ?? []).filter(
+          (image) => image !== validated.image_url && image !== existingProperty?.image_url,
+        ),
+      ],
     };
 
     const result = editingId
@@ -321,7 +338,7 @@ export function PropertyManager({ initialProperties, projects }: { initialProper
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="image">{t("image")}</Label>
-                    <Input id="image" type="url" value={draft.image_url} onChange={(event) => setDraft((current) => ({ ...current, image_url: event.target.value }))} required />
+                    <Input id="image" type="text" value={draft.image_url} onChange={(event) => setDraft((current) => ({ ...current, image_url: event.target.value }))} required />
                   </div>
                   <div className="grid gap-2">
                     <Label>{t("project")}</Label>
@@ -419,12 +436,16 @@ export function PropertyManager({ initialProperties, projects }: { initialProper
               {sorted.map((property) => {
                 const title = normalizeLocalizedText(property.title);
                 const localizedTitle = title[locale as keyof typeof title] || title.en;
+                const imageSource = imagePreviews[property.image_url]
+                  ?? (isSubmissionImagePath(property.image_url)
+                    ? PROPERTY_IMAGE_PLACEHOLDER
+                    : property.image_url);
                 return (
                   <TableRow key={property.id}>
                     <TableCell>
                       <div className="flex min-w-[230px] items-center gap-3">
                         <div className="relative size-11 shrink-0 overflow-hidden rounded-lg bg-muted">
-                          <Image src={property.image_url} alt="" fill sizes="44px" className="object-cover" />
+                          <Image src={imageSource} alt="" fill sizes="44px" className="object-cover" />
                         </div>
                         <div className="min-w-0">
                           <p className="truncate font-medium">{localizedTitle}</p>

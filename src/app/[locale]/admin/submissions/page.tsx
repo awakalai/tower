@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
+import { resolveSubmissionImageUrls } from "@/lib/storage/submission-images";
 import { createClient } from "@/lib/supabase/server";
 import { formatCurrency, formatNumber, toIntlLocale } from "@/lib/utils";
 
@@ -30,7 +31,15 @@ export default async function PropertySubmissionsPage({
   let request = supabase!.from("property_submissions").select("*").order("submitted_at", { ascending: false });
   if (requested !== "all") request = request.eq("status", requested);
   const { data } = await request;
-  const submissions = data ?? [];
+  const rawSubmissions = data ?? [];
+  const resolvedImages = await resolveSubmissionImageUrls(
+    supabase!,
+    rawSubmissions.flatMap((submission) => submission.image_urls),
+  );
+  const submissions = rawSubmissions.map((submission) => ({
+    ...submission,
+    image_urls: submission.image_urls.map((image) => resolvedImages[image] ?? image),
+  }));
   const formatter = new Intl.DateTimeFormat(toIntlLocale(locale), { dateStyle: "medium", timeStyle: "short" });
 
   return (
